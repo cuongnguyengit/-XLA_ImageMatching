@@ -10,11 +10,14 @@ from flask import Flask
 from Train import load_model
 from FeatureImage import feature_all
 from Similarity import Similarity
+from flask_cors import CORS
 
 matrix = load_model('Model/matrix.obj')
 matrix = matrix.reshape(matrix.shape[0], matrix.shape[2])
 list_path = load_model('Model/path.obj')
 app = Flask(__name__)
+CORS(app)
+
 def get_top(list_distance, length=10):
     index_out = np.argsort(np.array(list_distance))[:length]
     output = []
