@@ -64,7 +64,7 @@ def get_image_urls():
 def test():
     data = request.get_json()
     # print(data)
-    result = {}
+    result = {"list_url_cosine": [], "list_url_eu": []}
     if data is None:
         print("No valid request body, json missing!")
         result['error'] = 'No valid request body, json missing!'
