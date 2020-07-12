@@ -73,7 +73,7 @@ def test():
         length = data.get("len", 10)
         # this method convert and save the base64 string to image
         convert_and_save(img_data)
-        list_url_cosin, list_url_eu = get_list_url_similar(abs_url=dir_path + '/imageToSave.jpg', length=int(length))
+        list_url_cosin, list_url_eu = get_list_url_similar(abs_url=dir_path + '/imageToSave.png', length=int(length))
         result["list_url_cosine"] = list_url_cosin
         result["list_url_eu"] = list_url_eu
 
@@ -83,7 +83,7 @@ def test():
 
 import base64
 def convert_and_save(b64_string):
-    with open("imageToSave.jpg", "wb") as fh:
+    with open("imageToSave.png", "wb") as fh:
         fh.write(base64.decodebytes(b64_string.encode()))
 
 if __name__ == "__main__":
