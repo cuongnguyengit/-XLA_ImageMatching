@@ -83,7 +83,7 @@ def test():
 
 import base64
 def convert_and_save(b64_string):
-    with open("imageToSave.jpg", "wb") as fh:
+    with open("imageToSave.png", "wb") as fh:
         fh.write(base64.decodebytes(b64_string.encode()))
 
 if __name__ == "__main__":
