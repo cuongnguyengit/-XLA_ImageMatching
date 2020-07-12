@@ -30,7 +30,7 @@ class Train:
         for r, d, f in os.walk(self.data_path):
             for file in f:
                 if 'jpg' in file or 'png' in file:
-                    # print(os.path.join(os.path.abspath(self.data_path), file))
+                    print(os.path.join(os.path.abspath(self.data_path), file))
                     tmp.append(os.path.join(r, file))
         return tmp
 
