@@ -62,20 +62,25 @@ def get_image_urls():
 
 @app.route('/test', methods=['POST'])
 def test():
-    data = request.get_json()
-    # print(data)
     result = {"list_url_cosine": [], "list_url_eu": []}
-    if data is None:
-        print("No valid request body, json missing!")
-        result['error'] = 'No valid request body, json missing!'
-    else:
-        img_data = data['img']
-        length = data.get("len", 10)
-        # this method convert and save the base64 string to image
-        convert_and_save(img_data)
-        list_url_cosin, list_url_eu = get_list_url_similar(abs_url=dir_path + '/imageToSave.png', length=int(length))
-        result["list_url_cosine"] = list_url_cosin
-        result["list_url_eu"] = list_url_eu
+    try:
+        data = request.get_json()
+        # data = json.loads(js_data)
+        print(data)
+        if data is None:
+            print("No valid request body, json missing!")
+            result['error'] = 'No valid request body, json missing!'
+        else:
+            img_data = data['img'].replace('data:image/jpeg;base64,', '')
+            length = data.get("len", 10)
+            # this method convert and save the base64 string to image
+            convert_and_save(img_data)
+            list_url_cosin, list_url_eu = get_list_url_similar(abs_url=dir_path + '/imageToSave.jpg', length=int(length))
+            result["list_url_cosine"] = list_url_cosin
+            result["list_url_eu"] = list_url_eu
+    except Exception as e:
+        print(e)
+        result = {"error": e}
 
     res = make_response(jsonify(result))
     res.headers['Access-Control-Allow-Origin'] = '*'
@@ -83,8 +88,12 @@ def test():
 
 import base64
 def convert_and_save(b64_string):
-    with open("imageToSave.png", "wb") as fh:
-        fh.write(base64.decodebytes(b64_string.encode()))
+    # with open("imageToSave.png", "wb") as fh:
+    #     fh.write(base64.decodebytes(b64_string.encode()))
+    imgdata = base64.b64decode(b64_string)
+    filename = 'imageToSave.jpg'  # I assume you have a way of picking unique filenames
+    with open(filename, 'wb') as f:
+        f.write(imgdata)
 
 if __name__ == "__main__":
     # for i in col.find({}):
