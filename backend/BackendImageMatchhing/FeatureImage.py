@@ -1,6 +1,7 @@
 from skimage import feature
 import numpy as np, matplotlib.pyplot as plt
 from skimage.feature import greycomatrix, greycoprops, local_binary_pattern
+import scipy.stats
 import cv2
 
 
@@ -13,6 +14,24 @@ class Feature:
         H = feature.hog(gray, orientations=nbins, pixels_per_cell=cell_size,
                         cells_per_block=block_size, transform_sqrt=True, block_norm="L2")
         return H
+
+    @staticmethod
+    def fea_color_moment(image):
+        b, g, r = cv2.split(image)
+        def f(x):
+            # mean
+            mean = np.mean(x)
+            # variance
+            var = np.var(x)
+            # skew
+            skew = scipy.stats.skew(np.concatenate(x))
+
+            return [mean, var, skew]
+        result = f(b)
+        result.extend(f(g))
+        result.extend(f(r))
+        return np.array(result)
+
 
     @staticmethod
     def featureColorHist(gray):
@@ -56,7 +75,7 @@ class Feature:
         return hist
 
 
-def feature_all(path, hog=True, colorHist=True, moments=True, texture_comatrix=True, lbp=True):
+def feature_all(path, hog=True, colorHist=True, moments=True, texture_comatrix=True, lbp=True, colorMoment=True):
     img = plt.imread(path, cv2.IMREAD_UNCHANGED)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.resize(src=gray, dsize=(64, 128))
@@ -66,6 +85,9 @@ def feature_all(path, hog=True, colorHist=True, moments=True, texture_comatrix=T
         array_fea = np.hstack((array_fea, temp))
     if colorHist:
         temp = Feature.featureColorHist(gray).flatten()
+        array_fea = np.hstack((array_fea, temp))
+    if colorMoment:
+        temp = Feature.fea_color_moment(img).flatten()
         array_fea = np.hstack((array_fea, temp))
     if moments:
         m, hu = Feature.fea_hu_moments(gray)
@@ -96,13 +118,16 @@ if __name__ == '__main__':
     list_fea_comatrix = Feature.fea_texture_comatrix(gray)
     # LBP fea with numpoints and radius
     lbp = Feature.fea_LBP(gray)
+    # color moments
+    CM_fea = Feature.fea_color_moment(img)
     print('HOG', len(HOG_fea))
     print('CH', len(CH_fea))
+    print('CM', len(CM_fea))
     print('Mo', len(Mo))
     print('Hu Mo', len(Hu))
     print('Texture Comatrix', len(list_fea_comatrix))
     print('LBP', len(lbp))
-    print('Len', len(HOG_fea) + len(CH_fea) + len(Mo) + len(Hu) + len(list_fea_comatrix) + len(lbp))
+    print('LEN', len(HOG_fea) + len(CH_fea) + len(CM_fea) + len(Mo) + len(Hu) + len(list_fea_comatrix) + len(lbp))
 
     fea_sum = feature_all(path='Data/person.jpg')
     print(fea_sum.shape)
